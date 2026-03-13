@@ -206,17 +206,17 @@ mode = params.get("mode","presenter")
 def register_participant():
 
 
-if "participant_id" not in st.session_state:
+    if "participant_id" not in st.session_state:
 
-    pid = str(uuid.uuid4())
+        pid = str(uuid.uuid4())
 
-    df = pd.read_csv(PART_FILE)
+        df = pd.read_csv(PART_FILE)
 
-    df.loc[len(df)] = [pid]
+        df.loc[len(df)] = [pid]
 
-    df.to_csv(PART_FILE,index=False)
+        df.to_csv(PART_FILE,index=False)
 
-    st.session_state.participant_id = pid
+        st.session_state.participant_id = pid
 
 
 # ============================================================
@@ -225,13 +225,13 @@ if "participant_id" not in st.session_state:
 
 # ============================================================
 
-if mode == "presenter":
+    if mode == "presenter":
 
 
-    st.title("📊 Live Poll Presenter")
+        st.title("📊 Live Poll Presenter")
 
 # Split screen into chart area + QR code area
-    col1,col2 = st.columns([3,1])
+        col1,col2 = st.columns([3,1])
 
 
 # --------------------------------------------------------
