@@ -414,11 +414,11 @@ with col2:
 if mode == "participant":
 
 
-register_participant()
+    register_participant()
 
-st_autorefresh(interval=2000)
+    st_autorefresh(interval=2000)
 
-state = get_state()
+    state = get_state()
 
 
 # Waiting screen
