@@ -65,12 +65,6 @@ df.loc[len(df)] = [pid]
 df.to_csv(PART_FILE,index=False)
 st.session_state.participant_id = pid
 
-# -------------------------
-
-# PRESENTER
-
-# -------------------------
-
 if mode == "presenter":
 
 ```
@@ -161,9 +155,7 @@ with col1:
                 state["q_index"] = 0
                 state["poll_state"] = "waiting"
 
-                pd.DataFrame(
-                    columns=["question_id","participant_id","answer"]
-                ).to_csv(RESP_FILE,index=False)
+                pd.DataFrame(columns=["question_id","participant_id","answer"]).to_csv(RESP_FILE,index=False)
 
                 pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
 
@@ -188,12 +180,6 @@ with col2:
     st.caption("Participants scan this QR")
 ```
 
-# -------------------------
-
-# PARTICIPANT
-
-# -------------------------
-
 if mode == "participant":
 
 ```
@@ -208,7 +194,6 @@ if state["poll_state"] == "waiting":
     st.title("You are in the waiting zone")
 
     st.info("We will begin shortly")
-
 
 elif state["poll_state"] == "question":
 
@@ -237,7 +222,6 @@ elif state["poll_state"] == "question":
         ]
 
         if len(existing) > 0:
-
             st.warning("You already answered this question")
 
         else:
