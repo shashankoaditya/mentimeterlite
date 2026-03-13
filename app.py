@@ -411,7 +411,7 @@ with col2:
 
 # ============================================================
 
-elif mode == "participant":
+if mode == "participant":
 
 
 register_participant()
