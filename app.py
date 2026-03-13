@@ -403,7 +403,7 @@ with col2:
     st.image(buffer.getvalue(), width=260)
 
     st.caption("Participants scan this QR")
-```
+
 
 # ============================================================
 
@@ -413,7 +413,7 @@ with col2:
 
 elif mode == "participant":
 
-```
+
 register_participant()
 
 st_autorefresh(interval=2000)
@@ -476,4 +476,4 @@ elif state["poll_state"] == "question":
             df.to_csv(RESP_FILE,index=False)
 
             st.success("Response recorded")
-```
+
