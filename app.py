@@ -3,122 +3,205 @@ import pandas as pd
 import qrcode
 from io import BytesIO
 import os
+import uuid
+import json
 from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="Live Poll", layout="wide")
 
+# -----------------------------
+# FILES
+# -----------------------------
+
+QUEST_FILE = "questions.xlsx"
 RESP_FILE = "responses.csv"
+PART_FILE = "participants.csv"
+STATE_FILE = "poll_state.json"
 
-questions = [
-{
-"id":1,
-"question":"What does AI stand for?",
-"options":[
-"Artificial Intelligence",
-"Automated Internet",
-"Advanced Interface",
-"Algorithmic Input"
-]
-}
-]
+# -----------------------------
+# CREATE FILES IF NOT EXIST
+# -----------------------------
 
-# create response file
 if not os.path.exists(RESP_FILE):
     pd.DataFrame(columns=["question_id","answer"]).to_csv(RESP_FILE,index=False)
 
-# session state
-if "poll_state" not in st.session_state:
-    st.session_state.poll_state = "waiting"
+if not os.path.exists(PART_FILE):
+    pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
+
+if not os.path.exists(STATE_FILE):
+    with open(STATE_FILE,"w") as f:
+        json.dump({"poll_state":"waiting","q_index":0},f)
+
+# -----------------------------
+# LOAD QUESTIONS
+# -----------------------------
+
+questions_df = pd.read_excel(QUEST_FILE)
+
+# -----------------------------
+# STATE FUNCTIONS
+# -----------------------------
+
+def get_state():
+    with open(STATE_FILE) as f:
+        return json.load(f)
+
+def save_state(state):
+    with open(STATE_FILE,"w") as f:
+        json.dump(state,f)
+
+state = get_state()
+
+# -----------------------------
+# URL MODE
+# -----------------------------
 
 params = st.query_params
-mode = params.get("mode","home")
+mode = params.get("mode","presenter")
 
 # -----------------------------
-# LANDING PAGE (SHOW QR)
+# REGISTER PARTICIPANT
 # -----------------------------
 
-if mode == "home":
+def register_participant():
 
-    st.title("📊 Live Poll")
+    if "participant_id" not in st.session_state:
 
-    st.subheader("Scan the QR code to join")
+        pid = str(uuid.uuid4())
 
-    poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
+        df = pd.read_csv(PART_FILE)
 
-    qr = qrcode.make(poll_url)
+        df.loc[len(df)] = [pid]
 
-    buffer = BytesIO()
-    qr.save(buffer, format="PNG")
+        df.to_csv(PART_FILE,index=False)
 
-    st.image(buffer.getvalue(), width=300)
-
-    st.write("Use your phone camera to scan and join")
+        st.session_state.participant_id = pid
 
 # -----------------------------
-# PRESENTER DASHBOARD
+# PRESENTER SCREEN
 # -----------------------------
 
-elif mode == "presenter":
+if mode == "presenter":
 
-    st.title("Presenter Dashboard")
+    st.title("📊 Live Poll Presenter")
 
-    if st.session_state.poll_state == "waiting":
+    col1,col2 = st.columns([2,1])
 
-        st.header("Audience Joining")
+    with col1:
 
-        if st.button("Start Question"):
+        if state["poll_state"] == "waiting":
 
-            st.session_state.poll_state = "question"
+            st.subheader("Participants Joining")
 
-    elif st.session_state.poll_state == "question":
+            df = pd.read_csv(PART_FILE)
 
-        q = questions[0]
+            st.metric("Participants Joined", len(df))
 
-        st.header(q["question"])
+            if st.button("Start Poll"):
 
-        st_autorefresh(interval=2000, key="refresh")
+                state["poll_state"] = "question"
 
-        df = pd.read_csv(RESP_FILE)
+                save_state(state)
 
-        data = df[df["question_id"]==q["id"]]
+                st.rerun()
 
-        if len(data)>0:
+        elif state["poll_state"] == "question":
 
-            chart = data["answer"].value_counts()
+            q = questions_df.iloc[state["q_index"]]
 
-            st.bar_chart(chart)
+            question_text = q["question"]
 
-        else:
+            options = [
+            q["option1"],
+            q["option2"],
+            q["option3"],
+            q["option4"]
+            ]
 
-            st.info("Waiting for responses")
+            st.header(question_text)
+
+            st_autorefresh(interval=2000,key="chartrefresh")
+
+            df = pd.read_csv(RESP_FILE)
+
+            data = df[df["question_id"] == q["question_id"]]
+
+            if len(data)>0:
+
+                chart = data["answer"].value_counts()
+
+                st.bar_chart(chart)
+
+            else:
+
+                st.info("Waiting for responses")
+
+            if st.button("Next Question"):
+
+                state["q_index"] += 1
+
+                save_state(state)
+
+                st.rerun()
+
+    with col2:
+
+        st.subheader("Scan to Join")
+
+        poll_url = st.query_params.get("base","") 
+        poll_url = st.get_option("server.baseUrlPath")
+
+        join_url = st.experimental_get_url().split("?")[0] + "?mode=participant"
+
+        qr = qrcode.make(join_url)
+
+        buffer = BytesIO()
+
+        qr.save(buffer, format="PNG")
+
+        st.image(buffer.getvalue(), width=250)
+
+        st.caption("Participants scan this QR")
 
 # -----------------------------
-# PARTICIPANT PAGE
+# PARTICIPANT SCREEN
 # -----------------------------
 
 elif mode == "participant":
 
-    if st.session_state.poll_state == "waiting":
+    register_participant()
 
-        st.title("Connected")
+    st_autorefresh(interval=2000,key="participantrefresh")
 
-        st.info("Please wait for the first question")
+    state = get_state()
 
-    elif st.session_state.poll_state == "question":
+    if state["poll_state"] == "waiting":
 
-        q = questions[0]
+        st.title("You are in the waiting zone")
 
-        st.title(q["question"])
+        st.info("We will begin shortly")
 
-        answer = st.radio(
-        "Choose your answer",
-        q["options"]
-        )
+    elif state["poll_state"] == "question":
+
+        q = questions_df.iloc[state["q_index"]]
+
+        question_text = q["question"]
+
+        options = [
+        q["option1"],
+        q["option2"],
+        q["option3"],
+        q["option4"]
+        ]
+
+        st.title(question_text)
+
+        answer = st.radio("Choose your answer",options)
 
         if st.button("Submit"):
 
             new = pd.DataFrame({
-            "question_id":[q["id"]],
+            "question_id":[q["question_id"]],
             "answer":[answer]
             })
 
@@ -128,4 +211,4 @@ elif mode == "participant":
 
             df.to_csv(RESP_FILE,index=False)
 
-            st.success("Vote submitted")
+            st.success("Response recorded")
