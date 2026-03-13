@@ -121,7 +121,7 @@ if not os.path.exists(RESP_FILE):
 if not os.path.exists(PART_FILE):
 
 
-pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
+    pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
 
 
 # Create poll state file
@@ -228,10 +228,10 @@ if "participant_id" not in st.session_state:
 if mode == "presenter":
 
 
-st.title("📊 Live Poll Presenter")
+    st.title("📊 Live Poll Presenter")
 
 # Split screen into chart area + QR code area
-col1,col2 = st.columns([3,1])
+    col1,col2 = st.columns([3,1])
 
 
 # --------------------------------------------------------
