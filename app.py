@@ -160,7 +160,7 @@ def get_state():
 
     with open(STATE_FILE) as f:
 
-    return json.load(f)
+        return json.load(f)
 
 
 # Save poll state
