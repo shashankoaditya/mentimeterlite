@@ -86,13 +86,13 @@ if mode == "presenter":
 
     st.title("📊 Live Poll Presenter")
 
-    col1,col2 = st.columns([2,1])
+    col1,col2 = st.columns([3,1])
 
     with col1:
 
         if state["poll_state"] == "waiting":
 
-            st_autorefresh(interval=2000, key="participant_refresh")
+            st_autorefresh(interval=2000)
 
             st.subheader("Participants Joining")
 
@@ -112,8 +112,6 @@ if mode == "presenter":
 
             q = questions_df.iloc[state["q_index"]]
 
-            question_text = q["question"]
-
             options = [
                 q["option1"],
                 q["option2"],
@@ -121,17 +119,13 @@ if mode == "presenter":
                 q["option4"]
             ]
 
-            st.header(question_text)
+            st.header(q["question"])
 
-            st_autorefresh(interval=2000,key="chartrefresh")
+            st_autorefresh(interval=2000)
 
             df = pd.read_csv(RESP_FILE)
 
             data = df[df["question_id"] == q["question_id"]]
-
-            # -----------------------------
-            # PREPARE CHART DATA
-            # -----------------------------
 
             chart_data = pd.Series(0, index=options)
 
@@ -142,29 +136,21 @@ if mode == "presenter":
             chart_df = chart_data.reset_index()
             chart_df.columns = ["Option","Votes"]
 
-            # option colors
-            color_scale = alt.Scale(
-                domain=options,
-                range=["#FF4B4B","#4CAF50","#2196F3","#FFC107"]
-            )
+            chart_df["Color"] = ["#FF4B4B","#4CAF50","#2196F3","#FFC107"]
 
-            chart = alt.Chart(chart_df).mark_bar().encode(
-                x=alt.X('Option:N', axis=alt.Axis(labelAngle=0)),
-                y='Votes:Q',
-                color=alt.Color('Option:N', scale=color_scale, legend=None)
-            ).properties(height=400)
+            chart = alt.Chart(chart_df).mark_bar(size=70).encode(
+                x=alt.X("Option:N", axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("Votes:Q", axis=alt.Axis(title="Votes")),
+                color=alt.Color("Color:N", scale=None)
+            ).properties(height=420)
 
             st.altair_chart(chart, use_container_width=True)
-
-            # -----------------------------
-            # NAVIGATION BUTTONS
-            # -----------------------------
 
             colA,colB,colC = st.columns(3)
 
             with colA:
 
-                if st.button("Previous Question"):
+                if st.button("⬅ Previous Question"):
 
                     if state["q_index"] > 0:
 
@@ -176,7 +162,7 @@ if mode == "presenter":
 
             with colB:
 
-                if st.button("Next Question"):
+                if st.button("Next Question ➡"):
 
                     if state["q_index"] < len(questions_df)-1:
 
@@ -188,7 +174,7 @@ if mode == "presenter":
 
             with colC:
 
-                if st.button("Restart Quiz"):
+                if st.button("🔄 Restart Quiz"):
 
                     state["q_index"] = 0
                     state["poll_state"] = "waiting"
@@ -211,7 +197,7 @@ if mode == "presenter":
 
         qr.save(buffer, format="PNG")
 
-        st.image(buffer.getvalue(), width=250)
+        st.image(buffer.getvalue(), width=260)
 
         st.caption("Participants scan this QR")
 
@@ -223,7 +209,7 @@ elif mode == "participant":
 
     register_participant()
 
-    st_autorefresh(interval=2000,key="participantrefresh")
+    st_autorefresh(interval=2000)
 
     state = get_state()
 
@@ -237,8 +223,6 @@ elif mode == "participant":
 
         q = questions_df.iloc[state["q_index"]]
 
-        question_text = q["question"]
-
         options = [
             q["option1"],
             q["option2"],
@@ -248,18 +232,19 @@ elif mode == "participant":
 
         option_colors = ["#FF4B4B","#4CAF50","#2196F3","#FFC107"]
 
-        st.title(question_text)
+        st.title(q["question"])
 
         for i,opt in enumerate(options):
 
             st.markdown(
                 f"""
                 <div style="
-                padding:10px;
-                border-radius:8px;
+                padding:12px;
+                border-radius:10px;
                 background:{option_colors[i]};
                 color:white;
-                margin-bottom:6px;">
+                font-size:18px;
+                margin-bottom:8px;">
                 {opt}
                 </div>
                 """,
