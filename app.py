@@ -158,7 +158,7 @@ questions_df = pd.read_excel(QUEST_FILE)
 def get_state():
 
 
-with open(STATE_FILE) as f:
+    with open(STATE_FILE) as f:
 
     return json.load(f)
 
