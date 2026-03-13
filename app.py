@@ -90,6 +90,7 @@ if mode == "presenter":
     with col1:
 
         if state["poll_state"] == "waiting":
+            st_autorefresh(interval=2000, key="participant_refresh")
 
             st.subheader("Participants Joining")
 
