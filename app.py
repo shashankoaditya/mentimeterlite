@@ -126,24 +126,23 @@ if mode == "presenter":
             df = pd.read_csv(RESP_FILE)
 
             data = df[df["question_id"] == q["question_id"]]
+            chart_data = pd.Series(0, index=options)
 
-chart_data = pd.Series(0, index=options)
+            vote_counts = data["answer"].value_counts()
 
-vote_counts = data["answer"].value_counts()
+            chart_data.update(vote_counts)
 
-chart_data.update(vote_counts)
+            chart_df = chart_data.reset_index()
+            chart_df.columns = ["Option", "Votes"]
 
-chart_df = chart_data.reset_index()
-chart_df.columns = ["Option", "Votes"]
+            import altair as alt
 
-import altair as alt
-
-chart = alt.Chart(chart_df).mark_bar().encode(
-    x=alt.X('Option:N', axis=alt.Axis(labelAngle=0)),
-    y='Votes:Q'
-).properties(height=400)
-
-st.altair_chart(chart, use_container_width=True)
+            chart = alt.Chart(chart_df).mark_bar().encode(
+            x=alt.X('Option:N', axis=alt.Axis(labelAngle=0)),
+            y='Votes:Q'
+            ).properties(height=400)
+    
+            st.altair_chart(chart, use_container_width=True)
 
             if st.button("Next Question"):
 
