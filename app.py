@@ -110,11 +110,11 @@ STATE_FILE = "poll_state.json"
 
 if not os.path.exists(RESP_FILE):
 
-```
-pd.DataFrame(
+    ```
+    pd.DataFrame(
     columns=["question_id","participant_id","answer"]
-).to_csv(RESP_FILE,index=False)
-```
+    ).to_csv(RESP_FILE,index=False)
+    ```
 
 # Create participant file (stores joined users)
 
