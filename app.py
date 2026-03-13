@@ -6,6 +6,7 @@ import os
 import uuid
 import json
 from streamlit_autorefresh import st_autorefresh
+import altair as alt
 
 st.set_page_config(page_title="Live Poll", layout="wide")
 
@@ -90,6 +91,7 @@ if mode == "presenter":
     with col1:
 
         if state["poll_state"] == "waiting":
+
             st_autorefresh(interval=2000, key="participant_refresh")
 
             st.subheader("Participants Joining")
@@ -113,10 +115,10 @@ if mode == "presenter":
             question_text = q["question"]
 
             options = [
-            q["option1"],
-            q["option2"],
-            q["option3"],
-            q["option4"]
+                q["option1"],
+                q["option2"],
+                q["option3"],
+                q["option4"]
             ]
 
             st.header(question_text)
@@ -126,6 +128,11 @@ if mode == "presenter":
             df = pd.read_csv(RESP_FILE)
 
             data = df[df["question_id"] == q["question_id"]]
+
+            # -----------------------------
+            # PREPARE CHART DATA
+            # -----------------------------
+
             chart_data = pd.Series(0, index=options)
 
             vote_counts = data["answer"].value_counts()
@@ -133,31 +140,68 @@ if mode == "presenter":
             chart_data.update(vote_counts)
 
             chart_df = chart_data.reset_index()
-            chart_df.columns = ["Option", "Votes"]
+            chart_df.columns = ["Option","Votes"]
 
-            import altair as alt
+            # option colors
+            color_scale = alt.Scale(
+                domain=options,
+                range=["#FF4B4B","#4CAF50","#2196F3","#FFC107"]
+            )
 
             chart = alt.Chart(chart_df).mark_bar().encode(
-            x=alt.X('Option:N', axis=alt.Axis(labelAngle=0)),
-            y='Votes:Q'
+                x=alt.X('Option:N', axis=alt.Axis(labelAngle=0)),
+                y='Votes:Q',
+                color=alt.Color('Option:N', scale=color_scale, legend=None)
             ).properties(height=400)
-    
+
             st.altair_chart(chart, use_container_width=True)
 
-            if st.button("Next Question"):
+            # -----------------------------
+            # NAVIGATION BUTTONS
+            # -----------------------------
 
-                state["q_index"] += 1
+            colA,colB,colC = st.columns(3)
 
-                save_state(state)
+            with colA:
 
-                st.rerun()
+                if st.button("Previous Question"):
+
+                    if state["q_index"] > 0:
+
+                        state["q_index"] -= 1
+
+                        save_state(state)
+
+                        st.rerun()
+
+            with colB:
+
+                if st.button("Next Question"):
+
+                    if state["q_index"] < len(questions_df)-1:
+
+                        state["q_index"] += 1
+
+                        save_state(state)
+
+                        st.rerun()
+
+            with colC:
+
+                if st.button("Restart Quiz"):
+
+                    state["q_index"] = 0
+                    state["poll_state"] = "waiting"
+
+                    pd.DataFrame(columns=["question_id","answer"]).to_csv(RESP_FILE,index=False)
+
+                    save_state(state)
+
+                    st.rerun()
 
     with col2:
 
         st.subheader("Scan to Join")
-
-        poll_url = st.query_params.get("base","") 
-        poll_url = st.get_option("server.baseUrlPath")
 
         join_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
 
@@ -196,21 +240,39 @@ elif mode == "participant":
         question_text = q["question"]
 
         options = [
-        q["option1"],
-        q["option2"],
-        q["option3"],
-        q["option4"]
+            q["option1"],
+            q["option2"],
+            q["option3"],
+            q["option4"]
         ]
+
+        option_colors = ["#FF4B4B","#4CAF50","#2196F3","#FFC107"]
 
         st.title(question_text)
 
-        answer = st.radio("Choose your answer",options)
+        for i,opt in enumerate(options):
+
+            st.markdown(
+                f"""
+                <div style="
+                padding:10px;
+                border-radius:8px;
+                background:{option_colors[i]};
+                color:white;
+                margin-bottom:6px;">
+                {opt}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        answer = st.radio("Choose your answer", options)
 
         if st.button("Submit"):
 
             new = pd.DataFrame({
-            "question_id":[q["question_id"]],
-            "answer":[answer]
+                "question_id":[q["question_id"]],
+                "answer":[answer]
             })
 
             df = pd.read_csv(RESP_FILE)
