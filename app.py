@@ -151,7 +151,7 @@ if mode == "presenter":
         poll_url = st.query_params.get("base","") 
         poll_url = st.get_option("server.baseUrlPath")
 
-        join_url = st.experimental_get_url().split("?")[0] + "?mode=participant"
+        join_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
 
         qr = qrcode.make(join_url)
 
