@@ -131,10 +131,10 @@ if not os.path.exists(STATE_FILE):
 
     with open(STATE_FILE,"w") as f:
 
-    json.dump(
+        json.dump(
         {"poll_state":"waiting","q_index":0},
         f
-    )
+        )
 
 
 # ============================================================
