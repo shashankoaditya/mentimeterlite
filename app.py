@@ -3,12 +3,12 @@ import pandas as pd
 import qrcode
 from io import BytesIO
 import os
+from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="Live Poll", layout="wide")
 
 RESP_FILE = "responses.csv"
 
-# questions
 questions = [
 {
 "id":1,
@@ -26,46 +26,57 @@ questions = [
 if not os.path.exists(RESP_FILE):
     pd.DataFrame(columns=["question_id","answer"]).to_csv(RESP_FILE,index=False)
 
-# session states
-if "mode" not in st.session_state:
-    st.session_state.mode = "waiting"
-
-if "q_index" not in st.session_state:
-    st.session_state.q_index = 0
+# session state
+if "poll_state" not in st.session_state:
+    st.session_state.poll_state = "waiting"
 
 params = st.query_params
-user_mode = params.get("mode","home")
+mode = params.get("mode","home")
 
-# --------------------------
-# PRESENTER
-# --------------------------
+# -----------------------------
+# LANDING PAGE (SHOW QR)
+# -----------------------------
 
-if user_mode == "presenter":
+if mode == "home":
+
+    st.title("📊 Live Poll")
+
+    st.subheader("Scan the QR code to join")
+
+    poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
+
+    qr = qrcode.make(poll_url)
+
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+
+    st.image(buffer.getvalue(), width=300)
+
+    st.write("Use your phone camera to scan and join")
+
+# -----------------------------
+# PRESENTER DASHBOARD
+# -----------------------------
+
+elif mode == "presenter":
 
     st.title("Presenter Dashboard")
 
-    if st.session_state.mode == "waiting":
+    if st.session_state.poll_state == "waiting":
 
         st.header("Audience Joining")
 
-        poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
+        if st.button("Start Question"):
 
-        qr = qrcode.make(poll_url)
+            st.session_state.poll_state = "question"
 
-        buffer = BytesIO()
-        qr.save(buffer, format="PNG")
+    elif st.session_state.poll_state == "question":
 
-        st.image(buffer.getvalue(), width=250)
-
-        if st.button("Start First Question"):
-
-            st.session_state.mode = "question"
-
-    elif st.session_state.mode == "question":
-
-        q = questions[st.session_state.q_index]
+        q = questions[0]
 
         st.header(q["question"])
+
+        st_autorefresh(interval=2000, key="refresh")
 
         df = pd.read_csv(RESP_FILE)
 
@@ -81,26 +92,26 @@ if user_mode == "presenter":
 
             st.info("Waiting for responses")
 
-# --------------------------
-# PARTICIPANT
-# --------------------------
+# -----------------------------
+# PARTICIPANT PAGE
+# -----------------------------
 
-elif user_mode == "participant":
+elif mode == "participant":
 
-    if st.session_state.mode == "waiting":
+    if st.session_state.poll_state == "waiting":
 
         st.title("Connected")
 
         st.info("Please wait for the first question")
 
-    elif st.session_state.mode == "question":
+    elif st.session_state.poll_state == "question":
 
-        q = questions[st.session_state.q_index]
+        q = questions[0]
 
         st.title(q["question"])
 
         answer = st.radio(
-        "Choose one",
+        "Choose your answer",
         q["options"]
         )
 
@@ -117,4 +128,4 @@ elif user_mode == "participant":
 
             df.to_csv(RESP_FILE,index=False)
 
-            st.success("Response recorded")
+            st.success("Vote submitted")
