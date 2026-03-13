@@ -63,16 +63,16 @@ STATE_FILE = "poll_state.json"
 # ============================================================
 
 if not os.path.exists(RESP_FILE):
-pd.DataFrame(
-columns=["question_id","participant_id","answer"]
-).to_csv(RESP_FILE,index=False)
+    pd.DataFrame(
+    columns=["question_id","participant_id","answer"]
+    ).to_csv(RESP_FILE,index=False)
 
 if not os.path.exists(PART_FILE):
-pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
+    pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
 
 if not os.path.exists(STATE_FILE):
-with open(STATE_FILE,"w") as f:
-json.dump({"poll_state":"waiting","q_index":0},f)
+    with open(STATE_FILE,"w") as f:
+        json.dump({"poll_state":"waiting","q_index":0},f)
 
 # ============================================================
 
