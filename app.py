@@ -110,32 +110,32 @@ STATE_FILE = "poll_state.json"
 
 if not os.path.exists(RESP_FILE):
 
-    ```
+    
     pd.DataFrame(
     columns=["question_id","participant_id","answer"]
     ).to_csv(RESP_FILE,index=False)
-    ```
+    
 
 # Create participant file (stores joined users)
 
 if not os.path.exists(PART_FILE):
 
-```
+
 pd.DataFrame(columns=["id"]).to_csv(PART_FILE,index=False)
-```
+
 
 # Create poll state file
 
 if not os.path.exists(STATE_FILE):
 
-```
+
 with open(STATE_FILE,"w") as f:
 
     json.dump(
         {"poll_state":"waiting","q_index":0},
         f
     )
-```
+
 
 # ============================================================
 
@@ -157,21 +157,21 @@ questions_df = pd.read_excel(QUEST_FILE)
 
 def get_state():
 
-```
+
 with open(STATE_FILE) as f:
 
     return json.load(f)
-```
+
 
 # Save poll state
 
 def save_state(state):
 
-```
+
 with open(STATE_FILE,"w") as f:
 
     json.dump(state,f)
-```
+
 
 # Load current state into memory
 
@@ -205,7 +205,7 @@ mode = params.get("mode","presenter")
 
 def register_participant():
 
-```
+
 if "participant_id" not in st.session_state:
 
     pid = str(uuid.uuid4())
@@ -217,7 +217,7 @@ if "participant_id" not in st.session_state:
     df.to_csv(PART_FILE,index=False)
 
     st.session_state.participant_id = pid
-```
+
 
 # ============================================================
 
@@ -227,7 +227,7 @@ if "participant_id" not in st.session_state:
 
 if mode == "presenter":
 
-```
+
 st.title("📊 Live Poll Presenter")
 
 # Split screen into chart area + QR code area
