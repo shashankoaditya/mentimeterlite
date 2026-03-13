@@ -4,18 +4,50 @@ from io import BytesIO
 
 st.set_page_config(page_title="Live Poll", layout="centered")
 
-st.title("📊 Live Poll")
+# read URL parameters
+params = st.query_params
+mode = params.get("mode", "home")
 
-st.subheader("Scan the QR Code to Join")
+# -------------------------
+# LANDING PAGE
+# -------------------------
 
-# your deployed app URL
-poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
+if mode == "home":
 
-qr = qrcode.make(poll_url)
+    st.title("📊 Live Poll")
 
-buffer = BytesIO()
-qr.save(buffer, format="PNG")
+    st.subheader("Scan the QR Code to Join")
 
-st.image(buffer.getvalue(), width=300)
+    poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
 
-st.write("Use your phone to scan and join the poll.")
+    qr = qrcode.make(poll_url)
+
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+
+    st.image(buffer.getvalue(), width=300)
+
+    st.write("Use your phone to scan and join the poll")
+
+# -------------------------
+# PARTICIPANT PAGE
+# -------------------------
+
+elif mode == "participant":
+
+    st.title("Vote")
+
+    st.subheader("What does AI stand for?")
+
+    answer = st.radio(
+        "Choose",
+        [
+        "Artificial Intelligence",
+        "Automated Internet",
+        "Advanced Interface",
+        "Algorithmic Input"
+        ]
+    )
+
+    if st.button("Submit"):
+        st.success("Vote submitted")
