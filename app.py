@@ -1,53 +1,120 @@
 import streamlit as st
+import pandas as pd
 import qrcode
 from io import BytesIO
+import os
 
-st.set_page_config(page_title="Live Poll", layout="centered")
+st.set_page_config(page_title="Live Poll", layout="wide")
 
-# read URL parameters
+RESP_FILE = "responses.csv"
+
+# questions
+questions = [
+{
+"id":1,
+"question":"What does AI stand for?",
+"options":[
+"Artificial Intelligence",
+"Automated Internet",
+"Advanced Interface",
+"Algorithmic Input"
+]
+}
+]
+
+# create response file
+if not os.path.exists(RESP_FILE):
+    pd.DataFrame(columns=["question_id","answer"]).to_csv(RESP_FILE,index=False)
+
+# session states
+if "mode" not in st.session_state:
+    st.session_state.mode = "waiting"
+
+if "q_index" not in st.session_state:
+    st.session_state.q_index = 0
+
 params = st.query_params
-mode = params.get("mode", "home")
+user_mode = params.get("mode","home")
 
-# -------------------------
-# LANDING PAGE
-# -------------------------
+# --------------------------
+# PRESENTER
+# --------------------------
 
-if mode == "home":
+if user_mode == "presenter":
 
-    st.title("📊 Live Poll")
+    st.title("Presenter Dashboard")
 
-    st.subheader("Scan the QR Code to Join")
+    if st.session_state.mode == "waiting":
 
-    poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
+        st.header("Audience Joining")
 
-    qr = qrcode.make(poll_url)
+        poll_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
 
-    buffer = BytesIO()
-    qr.save(buffer, format="PNG")
+        qr = qrcode.make(poll_url)
 
-    st.image(buffer.getvalue(), width=300)
+        buffer = BytesIO()
+        qr.save(buffer, format="PNG")
 
-    st.write("Use your phone to scan and join the poll")
+        st.image(buffer.getvalue(), width=250)
 
-# -------------------------
-# PARTICIPANT PAGE
-# -------------------------
+        if st.button("Start First Question"):
 
-elif mode == "participant":
+            st.session_state.mode = "question"
 
-    st.title("Vote")
+    elif st.session_state.mode == "question":
 
-    st.subheader("What does AI stand for?")
+        q = questions[st.session_state.q_index]
 
-    answer = st.radio(
-        "Choose",
-        [
-        "Artificial Intelligence",
-        "Automated Internet",
-        "Advanced Interface",
-        "Algorithmic Input"
-        ]
-    )
+        st.header(q["question"])
 
-    if st.button("Submit"):
-        st.success("Vote submitted")
+        df = pd.read_csv(RESP_FILE)
+
+        data = df[df["question_id"]==q["id"]]
+
+        if len(data)>0:
+
+            chart = data["answer"].value_counts()
+
+            st.bar_chart(chart)
+
+        else:
+
+            st.info("Waiting for responses")
+
+# --------------------------
+# PARTICIPANT
+# --------------------------
+
+elif user_mode == "participant":
+
+    if st.session_state.mode == "waiting":
+
+        st.title("Connected")
+
+        st.info("Please wait for the first question")
+
+    elif st.session_state.mode == "question":
+
+        q = questions[st.session_state.q_index]
+
+        st.title(q["question"])
+
+        answer = st.radio(
+        "Choose one",
+        q["options"]
+        )
+
+        if st.button("Submit"):
+
+            new = pd.DataFrame({
+            "question_id":[q["id"]],
+            "answer":[answer]
+            })
+
+            df = pd.read_csv(RESP_FILE)
+
+            df = pd.concat([df,new],ignore_index=True)
+
+            df.to_csv(RESP_FILE,index=False)
+
+            st.success("Response recorded")
