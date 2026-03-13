@@ -238,10 +238,10 @@ def register_participant():
 # LEFT SIDE (MAIN CONTROL PANEL)
 # --------------------------------------------------------
 
-with col1:
+        with col1:
 
     # Waiting screen
-    if state["poll_state"] == "waiting":
+        if state["poll_state"] == "waiting":
 
         # Auto refresh every 2 seconds
         st_autorefresh(interval=2000)
@@ -266,50 +266,50 @@ with col1:
     # QUESTION SCREEN
     # --------------------------------------------------------
 
-    elif state["poll_state"] == "question":
-
+        elif state["poll_state"] == "question":
+        
         # Get current question
-        q = questions_df.iloc[state["q_index"]]
+            q = questions_df.iloc[state["q_index"]]
 
-        options = [
+            options =     [
             q["option1"],
             q["option2"],
             q["option3"],
             q["option4"]
-        ]
+            ]
 
-        st.header(q["question"])
+            st.header(q["question"])
 
         # Refresh chart every 2 seconds
-        st_autorefresh(interval=2000)
+            st_autorefresh(interval=2000)
 
         # Load responses
-        df = pd.read_csv(RESP_FILE)
+            df = pd.read_csv(RESP_FILE)
 
-        data = df[df["question_id"] == q["question_id"]]
+            data = df[df["question_id"] == q["question_id"]]
 
         # Create default vote count
-        chart_data = pd.Series(0, index=options)
+            chart_data = pd.Series(0, index=options)
 
-        vote_counts = data["answer"].value_counts()
+            vote_counts = data["answer"].value_counts()
 
-        chart_data.update(vote_counts)
+            chart_data.update(vote_counts)
 
         # Convert to dataframe for Altair
-        chart_df = chart_data.reset_index()
+            chart_df = chart_data.reset_index()
 
-        chart_df.columns = ["Option","Votes"]
+            chart_df.columns = ["Option","Votes"]
 
         # Assign colors to options
-        chart_df["Color"] = [
+            chart_df["Color"] = [
             "#FFC107",
             "#FF4B4B",
             "#4CAF50",
             "#2196F3"
-        ]
+            ]
 
         # Build bar chart
-        chart = alt.Chart(chart_df).mark_bar(size=80).encode(
+            chart = alt.Chart(chart_df).mark_bar(size=80).encode(
 
             x=alt.X(
                 "Option:N",
