@@ -132,15 +132,15 @@ if mode == "presenter":
 
 
             # prepare all options with zero votes
-chart_data = pd.Series(0, index=options)
+                chart_data = pd.Series(0, index=options)
 
 # count votes
-vote_counts = data["answer"].value_counts()
+                vote_counts = data["answer"].value_counts()
 
 # update counts
-chart_data.update(vote_counts)
+                chart_data.update(vote_counts)
 
-st.bar_chart(chart_data)
+                st.bar_chart(chart_data)
 
             else:
 
