@@ -181,6 +181,7 @@ else:
 
 def presenter_landing():
 
+    st_autorefresh(interval=1000)
     st.title("Live Poll")
 
     participant_url = "https://mentimeterlite-dxem3jgznxqheyg4ncjcus.streamlit.app/?mode=participant"
@@ -204,6 +205,7 @@ def presenter_landing():
 
 def participant_screen():
     
+    st_autorefresh(interval=2000)
     register_participant()
 
     state = load_state()
