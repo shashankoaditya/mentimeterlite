@@ -200,7 +200,7 @@ def presenter_landing():
 # Registers the participant and shows waiting screen until poll starts
 
 def participant_screen():
-
+    
     register_participant()
 
     state = load_state()
@@ -213,48 +213,7 @@ def participant_screen():
 
         return
 
-        state = load_state()
-
-        state["poll_started"] = True
-
-        save_state(state)
-
-        st.rerun()
-
-# Load the questions file and display the current question
-# Uses the current_question index from poll_state.json
-# The selected row contains the question and its options
-
-questions = load_questions()
-state = load_state()
-q_index = state["current_question"]
-
-q = questions[q_index]
-
-st.title(q["question"])
-
-# Display the 4 answer options as buttons
-# When a participant clicks an option, their response is saved
-# Also checks to ensure the participant has not already voted
-
-options = ["A", "B", "C", "D"]
-
-for opt in options:
-
-    if st.button(q[opt]):
-
-        pid = st.session_state["participant_id"]
-
-        if not has_answered(pid, q_index):
-
-            save_response(pid, q_index, opt)
-
-            st.success("Answer submitted")
-
-        else:
-
-            st.warning("You have already answered this question")
-
+      
 
 # Presenter view during the poll
 # Shows the current question and refreshes automatically to update results
@@ -262,6 +221,7 @@ for opt in options:
 
 def presenter_poll():
 
+    
     st_autorefresh(interval=2000)
 
     state = load_state()
@@ -270,7 +230,7 @@ def presenter_poll():
 
     q_index = state["current_question"]
 
-    q = questions.iloc[q_index]
+    q = questions[q_index]
 
     st.title(q["question"])
 
