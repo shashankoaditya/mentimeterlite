@@ -186,7 +186,7 @@ def presenter_landing():
 
     st.metric("Participants Joined", count)
 
-    if st.button("Start Poll"):
+    st.button("Start Poll"):
 
 # Participant entry screen
 # Registers the participant and shows waiting screen until poll starts
