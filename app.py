@@ -186,8 +186,12 @@ def presenter_landing():
 
     st.metric("Participants Joined", count)
 
-    st.button("Start Poll"):
+    if st.button("Start Poll"):
+            state = load_state()
+            state["poll_started"] = True
+            save_state(state)
 
+            st.rerun()
 # Participant entry screen
 # Registers the participant and shows waiting screen until poll starts
 
