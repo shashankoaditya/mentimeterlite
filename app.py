@@ -155,12 +155,16 @@ def show_chart(counts):
 # Participants scan this QR to open the poll on their device
 # Used on the presenter landing screen
 
+import io
 def generate_qr(url):
+        qr = qrcode.make(url)
 
-    qr = qrcode.make(url)
+        buf = io.BytesIO()
+        qr.save(buf, format="PNG")
+        buf.seek(0)
 
-    st.image(qr)
-
+        st.image(buf)
+    
 # Read URL query parameters to determine which screen to show
 # mode=presenter → presenter control screen
 # mode=participant → participant voting screen
