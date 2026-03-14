@@ -249,21 +249,21 @@ def presenter_poll():
     
     with col1:
         if st.button("Previous"):
-        state["current_question"] -= 1
-        save_state(state)
-        st.rerun()
+            state["current_question"] -= 1
+            save_state(state)
+            st.rerun()
     
     with col2:
         if st.button("Next"):
-        state["current_question"] += 1
-        save_state(state)
-        st.rerun()
+            state["current_question"] += 1
+            save_state(state)
+            st.rerun()
     
     with col3:
         if st.button("Restart"):
-        state["current_question"] = 0
-        state["poll_started"] = False
-        save_state(state)
+            state["current_question"] = 0
+            state["poll_started"] = False
+            save_state(state)
     
         open(RESPONSES_FILE, "w").close()
         open(PARTICIPANTS_FILE, "w").close()
