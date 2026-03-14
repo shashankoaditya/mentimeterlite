@@ -180,7 +180,7 @@ def presenter_landing():
 
     st.title("Live Poll")
 
-    participant_url = st.get_url() + "?mode=participant"
+    participant_url = "https://mentimeterlite-dxem3jgzxnqheyg4ncjcus.streamlit.app/?mode=participant"
 
     st.write("Scan this QR code to join the poll")
 
