@@ -170,6 +170,7 @@ def generate_qr(url):
 # mode=participant → participant voting screen
 
 params = st.query_params
+st.write("DEBUG PARAMS:", params)
 mode = params.get("mode")
 
 if mode is None:
