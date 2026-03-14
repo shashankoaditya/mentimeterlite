@@ -222,7 +222,7 @@ def participant_screen():
 # The selected row contains the question and its options
 
 questions = load_questions()
-
+state = load_state()
 q_index = state["current_question"]
 
 q = questions.iloc[q_index]
