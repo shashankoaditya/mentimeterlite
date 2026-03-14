@@ -180,7 +180,7 @@ def presenter_landing():
 
     st.title("Live Poll")
 
-    participant_url = "?mode=participant"
+    participant_url = st.get_url() + "?mode=participant"
 
     st.write("Scan this QR code to join the poll")
 
