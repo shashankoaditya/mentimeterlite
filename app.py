@@ -169,8 +169,11 @@ def generate_qr(url):
 # mode=presenter → presenter control screen
 # mode=participant → participant voting screen
 
-params = st.experimental_get_query_params()
-mode = params.get("mode", ["presenter"])[0]
+params = st.query_params
+mode = params.get("mode")
+
+if mode is None:
+    mode = "presenter"
 
 # Display the presenter landing page
 # Shows QR code for participants, participant count, and Start Poll button
