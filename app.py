@@ -15,7 +15,7 @@ STATE_FILE = "poll_state.json"
 # The app will call this function whenever it needs to display questions.
 def load_questions():
     with open("questions.json") as f:
-    return json.load(f)
+         return json.load(f)
 
 # Load current poll state from poll_state.json
 # If the file does not exist (first run), create a default state
