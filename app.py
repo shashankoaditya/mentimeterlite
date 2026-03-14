@@ -6,7 +6,7 @@ import altair as alt
 import qrcode
 from streamlit_autorefresh import st_autorefresh
 
-QUESTIONS_FILE = "questions.xlsx"
+QUESTIONS_FILE = "questions.json"
 RESPONSES_FILE = "responses.csv"
 PARTICIPANTS_FILE = "participants.csv"
 STATE_FILE = "poll_state.json"
@@ -14,8 +14,8 @@ STATE_FILE = "poll_state.json"
 # This function reads the questions file and returns it as a pandas DataFrame.
 # The app will call this function whenever it needs to display questions.
 def load_questions():
-    df = pd.read_excel(QUESTIONS_FILE)
-    return df
+    with open("questions.json") as f:
+    return json.load(f)
 
 # Load current poll state from poll_state.json
 # If the file does not exist (first run), create a default state
@@ -225,7 +225,7 @@ questions = load_questions()
 state = load_state()
 q_index = state["current_question"]
 
-q = questions.iloc[q_index]
+q = questions[q_index]
 
 st.title(q["question"])
 
