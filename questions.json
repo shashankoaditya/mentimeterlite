@@ -1,0 +1,26 @@
+[
+  {
+    "question": "What does AI stand for?",
+    "A": "Artificial Intelligence",
+    "B": "Automated Internet",
+    "C": "Advanced Interface",
+    "D": "Algorithmic Input",
+    "correct_answer": "Artificial Intelligence"
+  },
+  {
+    "question": "Which company created ChatGPT?",
+    "A": "Google",
+    "B": "Microsoft",
+    "C": "OpenAI",
+    "D": "Amazon",
+    "correct_answer": "OpenAI"
+  },
+  {
+    "question": "Which language is most used for AI?",
+    "A": "Python",
+    "B": "Java",
+    "C": "C++",
+    "D": "ABAP",
+    "correct_answer": "Python"
+  }
+]
