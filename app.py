@@ -124,7 +124,7 @@ def get_results(question_id):
     try:
         df = pd.read_csv(RESPONSES_FILE)
 
-        df = df[df["question_id"] == question_id]
+        df = df[df["question_id"] == question_id] if "question_id" in df.columns else df
 
         counts = df["answer"].value_counts()
 
