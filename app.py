@@ -218,7 +218,25 @@ def participant_screen():
 
         return
 
-      
+    q_index = state["current_question"]
+
+    q = questions[q_index]
+
+    st.title(q["question"])
+
+    options = ["A","B","C","D"]
+
+    for opt in options:
+
+        if st.button(q[opt]):
+
+            pid = st.session_state["participant_id"]
+
+            if not has_answered(pid, q_index):
+
+                save_response(pid, q_index, opt)
+
+                st.success("Answer submitted")
 
 # Presenter view during the poll
 # Shows the current question and refreshes automatically to update results
