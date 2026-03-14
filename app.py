@@ -237,38 +237,38 @@ def presenter_poll():
 # Get the vote counts for the current question
 # If responses exist, display the results chart
 
-counts = get_results(q_index)
-
-if len(counts) > 0:
-    show_chart(counts)
-
-# Presenter controls to move between questions or restart the poll
-# Updates poll_state.json and refreshes the app
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    if st.button("Previous"):
-        state["current_question"] -= 1
-        save_state(state)
-        st.rerun()
-
-with col2:
-    if st.button("Next"):
-        state["current_question"] += 1
-        save_state(state)
-        st.rerun()
-
-with col3:
-    if st.button("Restart"):
-        state["current_question"] = 0
-        state["poll_started"] = False
-        save_state(state)
-
-        open(RESPONSES_FILE, "w").close()
-        open(PARTICIPANTS_FILE, "w").close()
-
-        st.rerun()
+        counts = get_results(q_index)
+    
+        if len(counts) > 0:
+        show_chart(counts)
+    
+    # Presenter controls to move between questions or restart the poll
+    # Updates poll_state.json and refreshes the app
+    
+    col1, col2, col3 = st.columns(3)
+    
+        with col1:
+            if st.button("Previous"):
+                state["current_question"] -= 1
+                save_state(state)
+                st.rerun()
+    
+        with col2:
+            if st.button("Next"):
+                state["current_question"] += 1
+                save_state(state)
+                st.rerun()
+    
+        with col3:
+            if st.button("Restart"):
+                state["current_question"] = 0
+                state["poll_started"] = False
+                save_state(state)
+    
+                open(RESPONSES_FILE, "w").close()
+                open(PARTICIPANTS_FILE, "w").close()
+    
+                st.rerun()
 
 # Main control logic of the application
 # Decides whether to show presenter view or participant view
